@@ -27,3 +27,10 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_CHANNEL: WeekendWarrior
           SLACK_MESSAGE: "OK. The Docker image has been built and pushed successfuly."
+      - name: Notify Slack on failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: WekeendWarrior
+          SLACK_MESSAGE: "FAIL. The Docker image has been built and pushed fail."
