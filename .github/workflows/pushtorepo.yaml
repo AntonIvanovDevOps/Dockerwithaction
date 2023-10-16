@@ -20,3 +20,10 @@ jobs:
           push: true
           tags: |
             antonivanovdevops/docker_build:${{ github.ref_name }}
+      - name: Notify Slack on success
+        if: ${{ success() }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: WeekendWarrior
+          SLACK_MESSAGE: "OK. The Docker image has been built and pushed successfuly."
