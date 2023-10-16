@@ -17,3 +17,7 @@ jobs:
           registry: ghcr.io
           repository: <username>/<repository-name>
           tags: latest
+      - name: 'Build Inventory Image'
+        run: |
+           docker build . --tag ghcr.io/<your-GitHub-username>:latest
+           docker push ghcr.io/<your-GitHub-username>:latest
