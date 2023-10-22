@@ -1,9 +1,9 @@
 name: Slack Notification
 
 on:
-  schedule:
-    - cron: '0 * * * *' # Runs every hour
-  workflow_dispatch:
+ push:
+    branches:
+      - main
 
 jobs:
   check-pod-status:
