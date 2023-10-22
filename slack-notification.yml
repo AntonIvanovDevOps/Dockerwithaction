@@ -1,0 +1,21 @@
+name: Slack Notification
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch:
+
+jobs:
+  check-pod-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check pod status
+        uses: appleboy/kubectl-action@master
+        with:
+          args: get pods -n default
+          kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+      - name: Send Slack notification
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: ${{ steps.check-pod-status.outputs.stdout }}
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
