@@ -19,7 +19,7 @@ jobs:
           ssh-add - <<< "${{ secrets.SSH_KEY }}"
           ssh-keyscan -H ${{ secrets.PROXY_SERVER }} >> ~/.ssh/known_hosts
           ssh ${{ secrets.PROXY_USER }}@${{ secrets.PROXY_SERVER}} ssh-keyscan ${{ secrets.HOST_SERVER }} >> ~/.ssh/known_hosts
-          ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.PROXY_USER }}@${{ secrets.PROXY_SERVER }}" ${{ secrets.HOST_USER }}@${{ secrets.HOST_SERVER }} \
+          ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.JUMP_USERNAME }}@${{ secrets.JUMP_HOST }}" ${{ secrets.HOST_USER }}@${{ secrets.HOST}} \
           kubectl get pods -A >> report.log
       - name: check pods
         id: check-pods
