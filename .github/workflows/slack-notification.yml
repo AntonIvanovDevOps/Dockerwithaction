@@ -16,18 +16,19 @@ jobs:
         ssh-add - <<< "${{ secrets.SSH_KEY }}"
         ssh-keyscan ${{ secrets.PROXY_HOST }} >> ~/.ssh/known_hosts
         ssh ${{ secrets.PROXY_USERNAME }}@${{ secrets.PROXY_HOST}} ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-        ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.PROXY_USERNAME }}@${{ secrets.PROXY_HOST }}@${{ secrets.USERNAME }}@${{ secrets.HOST }}"
+        ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.PROXY_USER }}@${{ secrets.PROXY_SERVER }}" ${{ secrets.HOST_USER }}@${{ secrets.HOST_SERVER }} \
+        kubectl get pods -A >> report.log
     - name: check pods
       id: check-pods
       run: |
         echo "pods-failed=$(cat report.log | grep -v Running | wc -l)" >> $GITHUB_OUTPUT
-      - name: Check pod status
-        uses: appleboy/kubectl-action@master
-        with:
-          args: get pods -n default
-          kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
-      - name: Send Slack notification
-        uses: rtCamp/action-slack-notify@v2
-        with:
-          status: ${{ steps.check-pod-status.outputs.stdout }}
-          slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+    - name: Check pod status
+      uses: appleboy/kubectl-action@master
+      with:
+        args: get pods -n default
+        kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+    - name: Send Slack notification
+      uses: rtCamp/action-slack-notify@v2
+      with:
+        status: ${{ steps.check-pod-status.outputs.stdout }}
+        slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
