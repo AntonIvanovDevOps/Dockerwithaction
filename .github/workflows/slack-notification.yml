@@ -9,6 +9,18 @@ jobs:
   check-pod-status:
     runs-on: ubuntu-latest
     steps:
+    - name: Connection to host
+      run: |
+      mkdir ~/.ssh
+      eval `ssh-agent -s`
+      ssh-add - <<< "${{ secrets.SSH_KEY }}"
+      ssh-keyscan ${{ secrets.PROXY_HOST }} >> ~/.ssh/known_hosts
+      ssh ${{ secrets.PROXY_USERNAME }}@${{ secrets.PROXY_HOST}} ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.PROXY_USERNAME }}@${{ secrets.PROXY_HOST }}" ${{ secrets.USERNAME }}@${{ secrets.HOST }} "kubectl get pods -A" >> ${{ env.report }}
+    - name: check pods
+      id: check-pods
+      run: |
+        echo "pods-failed=$(cat report.log | grep -v Running | wc -l)" >> $GITHUB_OUTPUT
       - name: Check pod status
         uses: appleboy/kubectl-action@master
         with:
