@@ -7,8 +7,8 @@ on:
 
 jobs:
   check-pod-status:
-  runs-on: ubuntu-latest
-  steps:
+    runs-on: ubuntu-latest
+    steps:
     - name: Connection to host
       run: |
           mkdir ~/.ssh
