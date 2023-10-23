@@ -11,13 +11,13 @@ jobs:
     steps:
       - name: Connection to host
         run: |
-        mkdir ~/.ssh
-        eval `ssh-agent -s`
-        ssh-add - <<< "${{ secrets.SSH_KEY }}"
-        ssh-keyscan ${{ secrets.PROXY_HOST }} >> ~/.ssh/known_hosts
-        ssh ${{ secrets.PROXY_USERNAME }}@${{ secrets.PROXY_HOST}} ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-        ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.PROXY_USER }}@${{ secrets.PROXY_SERVER }}" ${{ secrets.HOST_USER }}@${{ secrets.HOST_SERVER }} \
-        kubectl get pods -A >> report.log
+          mkdir ~/.ssh
+          eval `ssh-agent -s`
+          ssh-add - <<< "${{ secrets.SSH_KEY }}"
+          ssh-keyscan ${{ secrets.PROXY_HOST }} >> ~/.ssh/known_hosts
+         ssh ${{ secrets.PROXY_USERNAME }}@${{ secrets.PROXY_HOST}} ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.PROXY_USER }}@${{ secrets.PROXY_SERVER }}" ${{ secrets.HOST_USER }}@${{ secrets.HOST_SERVER }} \
+          kubectl get pods -A >> report.log
       - name: check pods
         id: check-pods
         run: |
