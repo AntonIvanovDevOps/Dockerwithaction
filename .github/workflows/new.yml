@@ -1,7 +1,9 @@
 name: Check pods
 
 on:
-  workflow_dispatch
+  push:
+    branch:
+      - main
 
 jobs:
     check:
