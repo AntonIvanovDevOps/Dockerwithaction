@@ -17,8 +17,6 @@ jobs:
           mkdir ~/.ssh
           eval `ssh-agent -s`
           ssh-add - <<< "${{ secrets.SSH_KEY }}"
-          ssh-keyscan -H ${{ secrets.JUMP_HOST }} >> ~/.ssh/known_hosts
-          ssh ${{ secrets.JUMP_USERNAME }}@${{ secrets.JUMP_HOST}} ssh-keyscan ${{ secrets.HOST_SERVER }} >> ~/.ssh/known_hosts
       - name: check pods
         id: check-pods
         run: |
