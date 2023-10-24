@@ -24,13 +24,11 @@ jobs:
       - name: check pods
         id: check-pods
         run: |
-          echo "pods-failed=$(cat report.log | grep -v Running | wc -l)" >> $GITHUB_OUTPUT
-  
+          echo "pods-failed=$(cat report.log | grep -v Running | wc -l)" >> $GITHUB_OUTPUT 
       - name: Check crashed pods
         uses: actions/upload-artifact@v3
         with:
           path: report.log
-  
       - name: upload crashed pod's list
         if: steps.check-pods.outputs.pods-failed-count > 1
         uses: actions/upload-artifact@v3
