@@ -1,4 +1,4 @@
-name: create and test Kubernetes cluster
+name: Check Status of Pods
 
 on: workflow_dispatch
 
@@ -6,36 +6,33 @@ jobs:
   check-pods:
     runs-on: ubuntu-latest
     steps:
-    - name: Connect to Kubernetes Host
+    - name: Connect to K3s host
       run: |
-        set -x
         mkdir ~/.ssh
         eval `ssh-agent -s`
         ssh-add - <<< "${{ secrets.SSH_KEY }}"
         ssh-keyscan -p 32510 ${{ secrets.JUMP_HOST }} >> ~/.ssh/known_hosts
         ssh ${{ secrets.JUMP_USERNAME }}@${{ secrets.JUMP_HOST }} -p 32510 ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-        ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.JUMP_USERNAME }}@${{ secrets.JUMP_HOST }} -p 32510" ${{ secrets.HOST_USER }}@${{ secrets.HOST }} "kubectl get pods -A" >> output-pods.log
+        ssh -o ProxyCommand="ssh -W %h:%p ${{ secrets.JUMP_USERNAME }}@${{ secrets.JUMP_HOST }} -p 32510" ${{ secrets.HOST_USER }}@${{ secrets.HOST }} "kubectl get pods -A" >> output.log
 
     - name: Check Crash pods
       id: check-pods
       run: |
-        echo "$(cat  output-pods.log | grep -v Running)" >> crash_report 2>&1
-        echo "pods-dont-work=$(cat output-pods.log | grep -v 'Running\|Completed ' | wc -l)" >> $GITHUB_OUTPUT
+        echo "pods-failed=$(cat output.log | grep -v 'Running\|Completed ' | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Upload Crashed Pods List
-      if: steps.check-pods.outputs.pods-dont-work != 1
+      if: steps.check-pods.outputs.pods-failed != 1
       uses: actions/upload-artifact@v3
       with:
-        name: Dead pods
-        path: output-pods.log
+        path: output.log
 
-    - name: Slack notification about FAlL POD
+    - name: Slack notification
       uses: rtCamp/action-slack-notify@v2
-      if: steps.check-pods.outputs.pods-dont-work != 1
+      if: steps.check-pods.outputs.pods-failed != 1
       env:
         SLACK_CHANNEL: weekendwarrior-group
         SLACK_ICON: https://github.com/rtCamp.png?size=48
         SLACK_COLOR: #b62e2e
-        SLACK_MESSAGE: 'Some pods have problems: ${{ steps.check-pods.outputs.pods-dont-work }}'
-        SLACK_TITLE: Post Title
+        SLACK_MESSAGE: 'Some pods have problems: ${{ steps.check-pods.outputs.pods-failed }}'
+        SLACK_TITLE: "Some pods have crashed!"
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
