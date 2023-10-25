@@ -6,14 +6,6 @@ jobs:
   check-pods:
     runs-on: ubuntu-latest
     steps:
-    - name: Check SSH_PKEY Secret
-      run: |
-        echo "Secret SSH_PKEY: ${{ secrets.SSHKEY }}"
-        echo "${{ secrets.SSH_KEY }}" > secret.key.pem
-        chmod 600 secret.key.pem
-        ssh-keygen -l -f secret.key.pem
-      continue-on-error: true
-
     - name: Connect to Kubernetes Host
       run: |
         set -x
